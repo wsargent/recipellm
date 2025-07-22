@@ -1,0 +1,88 @@
+
+services:
+
+  ############################################
+  # Mealie
+  ############################################  
+
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest 
+    container_name: recipellm-mealie
+    restart: always
+    ports:
+      - "9925:9000" 
+    deploy:
+      resources:
+        limits:
+          memory: 1000M # 
+    volumes:
+      - mealie-data:/app/data/
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    environment:
+      # Set Backend ENV Variables Here
+      ALLOW_SIGNUP: "false"
+      PUID: 911
+      PGID: 911 
+
+  ############################################
+  # MCP Server
+  ############################################
+  
+  mcp:
+    build:
+      context: ./mcp
+      dockerfile: Dockerfile
+    container_name: recipellm-mcp
+    volumes:
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/etc/timezone:/etc/timezone:ro"
+    ports:
+      - "8000:8000"
+    environment:
+      NTFY_SERVER: $NTFY_SERVER
+      PREFECT_API_URL: $PREFECT_API_URL
+      MEALIE_API_KEY: $MEALIE_API_KEY
+      MEALIE_BASE_URL: $MEALIE_BASE_URL
+      LETTA_BASE_URL: http://recipellm-letta:8283
+      #LETTA_TOKEN: $LETTA_TOKEN
+      RECIPELLM_MCP_SERVER_URL: http://recipellm-mcp:8000/sse/
+    depends_on:
+      letta:
+        condition: service_healthy
+    restart: on-failure
+
+  ############################################
+  # MCP Server
+  ############################################
+
+  # Letta is an agent building framework with built-in memory/vectordb support.
+  # https://docs.letta.com/quickstart/docker
+  letta:
+    image: letta/letta:0.8.15
+    container_name: recipellm-letta
+    ports:
+      - 8283:8283
+      - 5432:5432
+    volumes:
+      - ~/.letta/.persist/pgdata:/var/lib/postgresql/data      
+    environment:
+      LETTA_DEBUG: "${LETTA_DEBUG:-false}"
+      # https://docs.letta.com/guides/server/providers/anthropic
+      ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY
+      # https://docs.letta.com/guides/server/providers/google
+      GEMINI_API_KEY: $GEMINI_API_KEY    
+      # Setting this up means we can do postgresql://letta:letta@localhost:5432/letta in Letta Desktop
+      LETTA_PG_DB: ${LETTA_PG_DB:-letta}
+      LETTA_PG_USER: ${LETTA_PG_USER:-letta}
+      LETTA_PG_PASSWORD: ${LETTA_PG_PASSWORD:-letta}
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8283/v1/health/"]
+      interval: 5s
+      timeout: 5s
+      retries: 18
+      start_period: 1s
+
+volumes:
+  mealie-data:
