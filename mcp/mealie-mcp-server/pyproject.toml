@@ -1,0 +1,29 @@
+[project]
+name = "mealie-mcp-server"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.12.0",
+    "pydantic>=2.11.3",
+    "python-dotenv>=1.1.0",
+]
+
+[tool.black]
+line-length = 88
+target-version = ["py312"]
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+line_length = 88
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[project.optional-dependencies]
+dev = ["black>=24.1.0", "isort>=5.13.0"]
