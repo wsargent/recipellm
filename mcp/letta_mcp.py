@@ -17,7 +17,7 @@ import structlog
 
 logger = structlog.get_logger()
 
-DEFAULT_LETTA_MODEL = "anthropic/claude-sonnet-4-20250514"
+DEFAULT_LETTA_MODEL = "letta/letta-free"
 
 DEFAULT_LETTA_EMBEDDING = "letta/letta-free"
 
