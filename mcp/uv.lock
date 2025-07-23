@@ -708,6 +708,18 @@ wheels = [
 ]
 
 [[package]]
+name = "python-ntfy"
+version = "0.6.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/4a/96/ed9ee2f850eb1d5b37f4bdf1b4da489218f774be9cb083494b41ad4accaf/python_ntfy-0.6.1.tar.gz", hash = "sha256:bf955569fee389e8d2ce2504b2512274cc1bdcca969f8f336f53f2176bfe19cb", size = 6861 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d2/c4/81567a0e236e78f9e6f5afe6663ed06949210c243330fd7221ba3d4ae825/python_ntfy-0.6.1-py3-none-any.whl", hash = "sha256:680fdda9348310c12861c62fbf7ef4db58cb12946d580ca41ba29ae3b8a17d88", size = 7591 },
+]
+
+[[package]]
 name = "pywin32"
 version = "311"
 source = { registry = "https://pypi.org/simple" }
@@ -758,6 +770,7 @@ dependencies = [
     { name = "httpx" },
     { name = "letta-client" },
     { name = "python-dotenv" },
+    { name = "python-ntfy" },
     { name = "requests" },
     { name = "structlog" },
 ]
@@ -777,6 +790,7 @@ requires-dist = [
     { name = "httpx" },
     { name = "letta-client", specifier = ">=0.1.207" },
     { name = "python-dotenv" },
+    { name = "python-ntfy", specifier = ">=0.6.1" },
     { name = "requests" },
     { name = "structlog" },
 ]

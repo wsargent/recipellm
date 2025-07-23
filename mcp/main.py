@@ -7,10 +7,9 @@ from typing import Optional
 import httpx
 import structlog
 from fastmcp import FastMCP
-from fastmcp.client.transports import StdioTransport
-from fastmcp.server.proxy import ProxyClient
 from starlette.requests import Request
 from starlette.responses import PlainTextResponse
+from python_ntfy import NtfyClient
 
 from letta_mcp import LettaAgent
 from mealie_mcp import MealieMCP
@@ -182,8 +181,6 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
         
         # Use the API token (either loaded or newly created)
         if api_token:
-            # Update the environment variable for the MCP server
-            os.environ["MEALIE_API_KEY"] = api_token
             mealie_api_key = api_token
             logger.info("API token set for MCP server use")
         else:
@@ -192,7 +189,25 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
 
         # Initialize MealieMCP instance and register tools
         mealie_client = MealieMCP(mealie_base_url, mealie_api_key)
-        
+        ntfy_client = NtfyClient(topic="default", server="http://recipellm-ntfy")
+
+        @mcp.tool
+        def notify(message: str, title: Optional[str] = None) -> str:
+            """Send a text-based message to the server.
+
+                Call this function to send a message to the server. The message will be sent
+                to the server and then broadcast to all clients subscribed to the topic.
+
+                Args:
+                    message: The message to send.
+                    title: The title of the message.
+
+                Returns:
+                    str: The response from the server.
+            """
+            response = ntfy_client.send(message=message, title=title)
+            return json.dumps(response)
+
         @mcp.tool
         async def find_recipes_in_mealie(
             search_term: str,
@@ -274,15 +289,12 @@ if __name__ == "__main__":
         logger.info("Starting RecipeLLM MCP Server")
         
         mealie_base_url = os.getenv("MEALIE_BASE_URL")
-        mealie_api_key = os.getenv("MEALIE_API_KEY")
+        mealie_api_key = load_api_token()
         recipellm_mcp_server_url = os.getenv("RECIPELLM_MCP_SERVER_URL")
         
         # Validate required environment variables
         if not mealie_base_url:
             logger.error("MEALIE_BASE_URL environment variable is required")
-            exit(1)
-        if not mealie_api_key:
-            logger.error("MEALIE_API_KEY environment variable is required")
             exit(1)
         if not recipellm_mcp_server_url:
             logger.error("RECIPELLM_MCP_SERVER_URL environment variable is required")

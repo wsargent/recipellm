@@ -40,17 +40,10 @@ services:
     ports:
       - "8000:8000"
     environment:
-      NTFY_SERVER: $NTFY_SERVER
-      PREFECT_API_URL: $PREFECT_API_URL
-      MEALIE_API_KEY: $MEALIE_API_KEY
-      MEALIE_BASE_URL: http://mealie:9000
+      NTFY_SERVER: http://recipellm-ntfy
+      MEALIE_BASE_URL: http://recipellm-mealie:9000
       LETTA_BASE_URL: http://recipellm-letta:8283
-      #LETTA_TOKEN: $LETTA_TOKEN
-      RECIPELLM_MCP_SERVER_URL: http://recipellm-mcp:8000/sse/
-      MEALIE_ADMIN_USERNAME: ${MEALIE_ADMIN_USERNAME:-admin123}
-      MEALIE_ADMIN_EMAIL: ${MEALIE_ADMIN_EMAIL:-admin@example.com}
-      MEALIE_ADMIN_PASSWORD: ${MEALIE_ADMIN_PASSWORD:-admin123}
-      MEALIE_ADMIN_FULL_NAME: ${MEALIE_ADMIN_FULL_NAME:-Administrator}
+      RECIPELLM_MCP_SERVER_URL: http://recipellm-mcp:8000/sse/      
     depends_on:
       letta:
         condition: service_healthy
@@ -94,6 +87,28 @@ services:
       retries: 18
       start_period: 1s
 
+  ntfy:
+      image: binwiederhier/ntfy:latest
+      container_name: recipellm-ntfy
+      restart: always
+      ports:
+        - "80:80"
+      volumes:
+        - ntfy-cache:/var/cache/ntfy
+        - ntfy-data:/var/lib/ntfy
+      environment:
+        - NTFY_BASE_URL=http://localhost
+        - NTFY_CACHE_FILE=/var/cache/ntfy/cache.db
+        - NTFY_AUTH_FILE=/var/lib/ntfy/user.db
+        - NTFY_BEHIND_PROXY=true
+        - NTFY_UPSTREAM_BASE_URL=https://ntfy.sh
+      deploy:
+        resources:
+          limits:
+            memory: 512M
+      command: serve
 volumes:
   mealie-data:
   mcp-data:
+  ntfy-data:
+  ntfy-cache:
