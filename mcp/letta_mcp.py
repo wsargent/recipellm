@@ -135,11 +135,9 @@ class LettaAgent:
         letta_model = self._default_letta_model()
         letta_embedding = self._default_letta_embedding()
         requested_tools = [
-            "mealie_get_recipes",
-            "mealie_get_recipe_concise",
-            "mealie_get_recipe_detailed",
-            "mealie_create_recipe",
-            "mealie_update_recipe"
+            "find_recipes_in_mealie",
+            "add_recipe_to_mealie_from_url",
+            "get_recipe_in_mealie"
         ]
         env_vars = {}
 
