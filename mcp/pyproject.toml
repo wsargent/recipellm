@@ -9,6 +9,8 @@ dependencies = [
     "python-dotenv",
     "letta-client>=0.1.207",
     "structlog",
+    "httpx",
+    "requests",
 ]
 
 [dependency-groups]

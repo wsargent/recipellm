@@ -10,7 +10,8 @@ services:
     container_name: recipellm-mealie
     restart: always
     ports:
-      - "9925:9000" 
+      - "8080:8080"
+      - "9000:9000"
     deploy:
       resources:
         limits:
@@ -21,9 +22,7 @@ services:
       - "/etc/timezone:/etc/timezone:ro"
     environment:
       # Set Backend ENV Variables Here
-      ALLOW_SIGNUP: "false"
-      PUID: 911
-      PGID: 911 
+      ALLOW_SIGNUP: "true"      
 
   ############################################
   # MCP Server
@@ -37,20 +36,32 @@ services:
     volumes:
       - "/etc/localtime:/etc/localtime:ro"
       - "/etc/timezone:/etc/timezone:ro"
+      - mcp-data:/app/data
     ports:
       - "8000:8000"
     environment:
       NTFY_SERVER: $NTFY_SERVER
       PREFECT_API_URL: $PREFECT_API_URL
       MEALIE_API_KEY: $MEALIE_API_KEY
-      MEALIE_BASE_URL: $MEALIE_BASE_URL
+      MEALIE_BASE_URL: http://mealie:9000
       LETTA_BASE_URL: http://recipellm-letta:8283
       #LETTA_TOKEN: $LETTA_TOKEN
       RECIPELLM_MCP_SERVER_URL: http://recipellm-mcp:8000/sse/
+      MEALIE_ADMIN_USERNAME: ${MEALIE_ADMIN_USERNAME:-admin123}
+      MEALIE_ADMIN_EMAIL: ${MEALIE_ADMIN_EMAIL:-admin@example.com}
+      MEALIE_ADMIN_PASSWORD: ${MEALIE_ADMIN_PASSWORD:-admin123}
+      MEALIE_ADMIN_FULL_NAME: ${MEALIE_ADMIN_FULL_NAME:-Administrator}
     depends_on:
       letta:
         condition: service_healthy
     restart: on-failure
+    command: >
+      sh -c "
+        /app/.venv/bin/python /app/main.py &
+        sleep 10 &&
+        curl -X POST http://localhost:8000/setup &&
+        wait
+      "
 
   ############################################
   # MCP Server
@@ -59,11 +70,10 @@ services:
   # Letta is an agent building framework with built-in memory/vectordb support.
   # https://docs.letta.com/quickstart/docker
   letta:
-    image: letta/letta:0.8.15
+    image: letta/letta:0.8.17
     container_name: recipellm-letta
     ports:
       - 8283:8283
-      - 5432:5432
     volumes:
       - ~/.letta/.persist/pgdata:/var/lib/postgresql/data      
     environment:
@@ -86,3 +96,4 @@ services:
 
 volumes:
   mealie-data:
+  mcp-data:
