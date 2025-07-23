@@ -13,6 +13,8 @@ from python_ntfy import NtfyClient
 
 from letta_mcp import LettaAgent
 from mealie_mcp import MealieMCP
+import parsedatetime
+
 
 # Configure structlog
 structlog.configure(
@@ -206,6 +208,28 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
                     str: The response from the server.
             """
             response = ntfy_client.send(message=message, title=title)
+            return json.dumps(response)
+
+        @mcp.tool
+        def schedule_notification(scheduled_time: str, message: str, title: Optional[str] = None) -> str:
+            """Send a text-based message to the server.
+
+                Call this function to send a scheduled message to the server. The message will be sent at the given time.
+
+                Args:
+                    scheduled_time: A string using relative or absolute time, i.e. "5 minutes from now"
+                    message: The message to send.
+                    title: The title of the message.
+
+                Returns:
+                    str: The response from the server.
+            """
+
+            cal = parsedatetime.Calendar()
+            scheduled_time_datetime, parse_status = cal.parseDT(scheduled_time, tzinfo=None)
+            logger.info(f"Scheduled time: {scheduled_time_datetime} parsed {parse_status}")
+
+            response = ntfy_client.send(message=message, title=title, schedule=scheduled_time_datetime)
             return json.dumps(response)
 
         @mcp.tool

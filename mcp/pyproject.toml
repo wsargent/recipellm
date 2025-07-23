@@ -12,6 +12,7 @@ dependencies = [
     "httpx",
     "requests",
     "python-ntfy>=0.6.1",
+    "parsedatetime>=2.6",
 ]
 
 [dependency-groups]

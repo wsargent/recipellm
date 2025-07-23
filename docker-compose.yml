@@ -43,7 +43,10 @@ services:
       NTFY_SERVER: http://recipellm-ntfy
       MEALIE_BASE_URL: http://recipellm-mealie:9000
       LETTA_BASE_URL: http://recipellm-letta:8283
-      RECIPELLM_MCP_SERVER_URL: http://recipellm-mcp:8000/sse/      
+      RECIPELLM_MCP_SERVER_URL: http://recipellm-mcp:8000/sse/   
+      # chat model to use when the chef-agent is created.
+      #LETTA_CHAT_MODEL: "anthropic/claude-sonnet-4-20250514"
+      LETTA_CHAT_MODEL: "google_ai/gemini-2.5-flash"
     depends_on:
       letta:
         condition: service_healthy

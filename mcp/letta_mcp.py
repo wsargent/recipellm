@@ -17,13 +17,21 @@ import structlog
 
 logger = structlog.get_logger()
 
-DEFAULT_LETTA_MODEL = "letta/letta-free"
+DEFAULT_LETTA_MODEL = os.getenv("LETTA_CHAT_MODEL", "letta/letta-free")
 
-DEFAULT_LETTA_EMBEDDING = "letta/letta-free"
+DEFAULT_LETTA_EMBEDDING = os.getenv("LETTA_EMBEDDING_MODEL", "letta/letta-free")
 
 CHEF_AGENT_NAME = "chef-agent"
 
 DEFAULT_RETURN_CHAR_LIMIT = 6000
+
+MEALIE_BASE_URL = os.getenv("MEALIE_BASE_URL", "http://localhost:9000")
+
+HUMAN_PERSONA = f"""
+The mealie instance is at {MEALIE_BASE_URL}.
+ 
+To create a URL directly to a Mealie recipe using a slug, use {MEALIE_BASE_URL}/g/home/r/your_slug_name_here
+"""
 
 CHEF_PERSONA = """
 You are an experienced chef who is training and educating an inexperienced cook in the kitchen.  Your cook will ask you to help out with a recipe, and you will provide context and step by step instructions for your chef.
@@ -62,7 +70,16 @@ Organize tasks in order:
 * Plan when to start cooking the side dish so it finishes with the main
 * Be explicit about opportunities for parallel work, saying things like "While the chicken marinates, let's prep the carrots."
 
-##Archival memory
+## Scheduled Notifications
+
+When the user is about to start cooking, you should analyze the recipe to determine when you should schedule notifications to remind the user of various activities.
+
+Use the schedule_notification tool to help the user keep track of cooking times and when to turn or stir at intervals.  
+You can also schedule notifications to remind the user to check in and monitor activities.
+
+Please ask the user if they would like you to schedule notifications before scheduling them.
+
+## Archival memory
 
 Record significant events and important information using archival_memory_insert so you can access those memories later.  
 
@@ -136,6 +153,7 @@ class LettaAgent:
         letta_embedding = self._default_letta_embedding()
         requested_tools = [
             "notify",
+            "schedule_notification",
             "find_recipes_in_mealie",
             "add_recipe_to_mealie_from_url",
             "get_recipe_in_mealie"
@@ -144,7 +162,7 @@ class LettaAgent:
 
         agent_id = await self._create_agent(
             agent_name=CHEF_AGENT_NAME, 
-            human_block_content="", 
+            human_block_content=HUMAN_PERSONA,
             persona_block_content=CHEF_PERSONA, 
             letta_model=letta_model,
             letta_embedding=letta_embedding,
