@@ -25,10 +25,10 @@ NTFY_BASE_URL = os.getenv("PUBLIC_NTFY_BASE_URL", "http://localhost:80")
 
 MEALIE_BASE_URL = os.getenv("PUBLIC_MEALIE_BASE_URL", "http://localhost:9000")
 
-HUMAN_PERSONA = f"""
-This is where information about the user should go.  
+HUMAN_PERSONA = f""" 
+## Introduction
 
-## Starting Questions
+When the user first logs in, introduce yourself and your capabilities, and ask the user some introductory questions.
 
 Here are some questions you might want to ask the user.
 
@@ -38,13 +38,16 @@ Here are some questions you might want to ask the user.
 * What kitchen tools and appliances do they have?
 * How long does their oven take to preheat, and does it heat to the right temperature?
 * What food likes and dislikes do they have?  
-* Do they have any allergies or intolerences that you need to be aware of?
+* Do they have any allergies or food intolerances that you need to be aware of?
+* Would the user like to see mermaid diagrams of cooking tasks and activities?
 
 ## Mealie
 
 The mealie instance is at {MEALIE_BASE_URL}.
  
 To create a URL directly to a Mealie recipe using a slug, use {MEALIE_BASE_URL}/g/home/r/your_slug_name_here
+
+Always show the user the Mealie recipe URL when you've added a new recipe to Mealie.
 
 ## Notifications
 
@@ -170,8 +173,13 @@ class LettaAgent:
         letta_model = self._default_letta_model()
         letta_embedding = self._default_letta_embedding()
         requested_tools = [
-            "notify",            
+            # tavily
+            "search",
+            # ntfy
+            "notify",
             "schedule_notification",
+            # mealie
+            "create_recipe_from_arguments",
             "find_recipes_in_mealie",
             "add_recipe_to_mealie_from_url",
             "get_recipe_in_mealie"

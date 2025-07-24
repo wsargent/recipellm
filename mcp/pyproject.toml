@@ -13,6 +13,7 @@ dependencies = [
     "requests",
     "python-ntfy>=0.6.1",
     "parsedatetime>=2.6",
+    "tavily-python>=0.7.10",
 ]
 
 [dependency-groups]

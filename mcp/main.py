@@ -14,6 +14,12 @@ from starlette.responses import PlainTextResponse
 
 from letta_agent import LettaAgent
 from mealie_client import MealieClient
+from tavily import TavilyClient
+
+TAVILY_BASE_URL = "https://api.tavily.com/search"
+
+DEFAULT_MAX_RESULTS = 5
+DEFAULT_SEARCH_DEPTH = "basic"
 
 # Configure structlog
 structlog.configure(
@@ -298,12 +304,29 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
                 str: Success message.
             """
             return mealie_client.add_recipe_note(recipe_slug, note_title, note_text)
-
-
-
     except Exception as e:
         logger.error("Failed to setup server", error=str(e), exc_info=True)
         raise
+
+    @mcp.tool
+    def search(query: str, max_results: int = 5) -> str:
+        """Uses [Tavily](https://docs.tavily.com/welcome) to search the web.  
+        You can use this to find recipes on the internet and pass the URLs to Mealie.
+
+        Args:
+            query (str): The search query.
+            max_results (int, optional): The maximum number of results to return. Defaults to 5.
+
+        Returns:
+            str: The search results.
+        """
+        tavily_api_key = os.getenv("TAVILY_API_KEY")
+        if not tavily_api_key:
+            return "Search failed: no tavily API key found!"
+
+        client = TavilyClient(api_key=tavily_api_key)
+        results = client.search(query=query, depth="basic", max_results=max_results)
+        return json.dumps(results)
 
 async def create_chef_agent():
     letta_agent = LettaAgent()
