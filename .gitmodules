@@ -1,0 +1,3 @@
+[submodule "openai-proxy"]
+	path = openai-proxy
+	url = https://github.com/wsargent/letta-openai-proxy

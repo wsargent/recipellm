@@ -11,8 +11,8 @@ from starlette.requests import Request
 from starlette.responses import PlainTextResponse
 from python_ntfy import NtfyClient
 
-from letta_mcp import LettaAgent
-from mealie_mcp import MealieMCP
+from letta_agent import LettaAgent
+from mealie_client import MealieClient
 import parsedatetime
 
 
@@ -156,7 +156,7 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
 
         letta_agent = LettaAgent()
         server_list = await letta_agent.setup_mcp_server(recipellm_mcp_server_url)
-        logger.info("Setup Letta server with server_list")
+        logger.info(f"Setup Letta server with server_list {server_list}")
 
         # Try to load existing API token
         api_token = load_api_token()
@@ -190,8 +190,9 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
             # Keep using the original mealie_api_key from environment
 
         # Initialize MealieMCP instance and register tools
-        mealie_client = MealieMCP(mealie_base_url, mealie_api_key)
-        ntfy_client = NtfyClient(topic="default", server="http://recipellm-ntfy")
+        mealie_client = MealieClient(mealie_base_url, mealie_api_key)
+        nfty_base_url = os.getenv("NTFY_SERVER", "http://recipellm-ntfy")
+        ntfy_client = NtfyClient(topic="default", server=nfty_base_url)
 
         @mcp.tool
         def notify(message: str, title: Optional[str] = None) -> str:
@@ -283,6 +284,23 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
                 str: The text of the recipe.
             """
             return mealie_client.get_recipe_in_mealie(slug)
+
+        @mcp.tool
+        async def add_recipe_note_to_mealie(recipe_slug: str, note_title: str, note_text: str) -> str:
+            """Appends a new note to the given recipe in Mealie.
+
+            Args:
+                recipe_slug (str): The slug of the recipe to update.
+                note_title (str): The title of the note (relevant to discussion).
+                note_text (str): The text of the note (chef recommendation and summary,
+                    may be used for archival memory purposes).
+
+            Returns:
+                str: Success message.
+            """
+            return mealie_client.add_recipe_note(recipe_slug, note_title, note_text)
+
+
 
     except Exception as e:
         logger.error("Failed to setup server", error=str(e), exc_info=True)

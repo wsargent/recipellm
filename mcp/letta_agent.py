@@ -1,19 +1,15 @@
-from letta_client.types.sse_server_config import SseServerConfig
-from letta_client import LettaEnvironment
-from letta_client import AsyncLetta
 import os
-from typing import Optional
+from typing import List, Optional
 
-import datetime
-from typing import Dict, List, Optional
-
+import structlog
 from letta_client import (
+    AsyncLetta,
     CreateBlock,
+    LettaEnvironment,
     LlmConfig,
 )
 from letta_client.types import Tool
-
-import structlog
+from letta_client.types.sse_server_config import SseServerConfig
 
 logger = structlog.get_logger()
 
@@ -25,12 +21,34 @@ CHEF_AGENT_NAME = "chef-agent"
 
 DEFAULT_RETURN_CHAR_LIMIT = 6000
 
-MEALIE_BASE_URL = os.getenv("MEALIE_BASE_URL", "http://localhost:9000")
+NTFY_BASE_URL = os.getenv("PUBLIC_NTFY_BASE_URL", "http://localhost:80")
+
+MEALIE_BASE_URL = os.getenv("PUBLIC_MEALIE_BASE_URL", "http://localhost:9000")
 
 HUMAN_PERSONA = f"""
+This is where information about the user should go.  
+
+## Starting Questions
+
+Here are some questions you might want to ask the user.
+
+* How experienced is the user with cooking?
+* What cuisine are they most familiar with?
+* What are the user's goals in cooking?
+* What kitchen tools and appliances do they have?
+* How long does their oven take to preheat, and does it heat to the right temperature?
+* What food likes and dislikes do they have?  
+* Do they have any allergies or intolerences that you need to be aware of?
+
+## Mealie
+
 The mealie instance is at {MEALIE_BASE_URL}.
  
 To create a URL directly to a Mealie recipe using a slug, use {MEALIE_BASE_URL}/g/home/r/your_slug_name_here
+
+## Notifications
+
+The ntfy service is at {NTFY_BASE_URL}.  When creating a notification, make sure the user has a browser tab open on that page to receive notifications.
 """
 
 CHEF_PERSONA = """

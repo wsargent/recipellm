@@ -1,14 +1,19 @@
 from typing import Any
 
 import requests
-import os
 
 from urllib.parse import urljoin
 
-class MealieMCP:
+class MealieClient:
     def __init__(self, base_url: str, api_key: str):
         self.base_url = base_url
         self.api_key = api_key
+
+    def headers(self):
+        return {
+            "accept": "application/json",
+            "Authorization": "Bearer " + self.api_key
+        }
 
     def find_recipes_in_mealie(
             self,
@@ -59,11 +64,6 @@ class MealieMCP:
 
     {description}
     """
-        headers = {
-            "accept": "application/json",
-            "Authorization": "Bearer " + self.api_key
-        }
-
         endpoint = urljoin(self.base_url, '/api/recipes')
 
         params: dict[str, Any] = {
@@ -81,7 +81,7 @@ class MealieMCP:
         if tags_csv:
             params['tags'] = [tag.strip() for tag in tags_csv.split(",")]
 
-        response = requests.get(endpoint, headers=headers, params=params)
+        response = requests.get(endpoint, headers=self.headers(), params=params)
         response.raise_for_status()
 
         recipes_json = response.json()
@@ -108,12 +108,6 @@ class MealieMCP:
         Returns:
             str: The recipe slug of the added recipe. This can be used to update the recipe later.
         """
-
-        headers = {
-            "accept": "application/json",
-            "Authorization": "Bearer " + self.api_key
-        }
-
         body = {
             "include_tags": include_tags,
             "url": recipe_url,
@@ -121,7 +115,7 @@ class MealieMCP:
         response = requests.post(
             f"{self.base_url}/api/recipes/create/url",
             json=body,
-            headers=headers
+            headers=self.headers()
         )
         return response.text.strip('\"')
 
@@ -179,17 +173,40 @@ class MealieMCP:
     {recipe_instructions}
     """
 
-        headers = {
-            "accept": "application/json",
-            "Authorization": "Bearer " + self.api_key
-        }
-
         endpoint = urljoin(self.base_url, f'/api/recipes/{slug}')
-
-        response = requests.get(endpoint, headers=headers)
+        response = requests.get(endpoint, headers=self.headers())
         response.raise_for_status()
 
         recipe = response.json()
         return parse_recipe_json(recipe)
 
+    def add_recipe_note(self, recipe_slug: str, note_title: str, note_text:str) -> str:
+        """Appends a new note to the given recipe in Mealie.
 
+        Args:
+            recipe_slug (str): The slug of the recipe to update.
+            note_title (str): The title of the node (relevant to discussion).
+            note_text (str): The text of the note (chef recommendation and summary,
+                may be used for archival memory purposes).
+        """
+
+        endpoint = urljoin(self.base_url, f'/api/recipes/{recipe_slug}')
+        recipe_response = requests.get(endpoint, headers=self.headers())
+        recipe_response.raise_for_status()
+        recipe = recipe_response.json()
+        notes = recipe["notes"]
+        new_note = {
+            "title": note_title,
+            "text": note_text
+        }
+        notes.append(new_note)
+        body = {
+            "notes": notes
+        }
+        response = requests.patch(
+            f"{endpoint}/api/recipes/{recipe_slug}",
+            json=body,
+            headers=self.headers()
+        )
+        response.raise_for_status()
+        return response.json()["notes"]

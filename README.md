@@ -6,10 +6,8 @@ Set up the system:
  docker compose down -v --remove-orphans && docker compose up --build
 ```
 
-Hit the MCP server with `POST /setup` to create chef agent:
+In another terminal, connect to the client to say hi.
 
 ```
-curl -X POST http://localhost:8000/setup
+uv run python cli_client.py  
 ```
-
-And from there send a message to the chef agent saying anything and you'll see the stack trace.
