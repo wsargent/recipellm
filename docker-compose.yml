@@ -10,7 +10,7 @@ services:
     container_name: recipellm-mealie
     restart: always
     ports:
-      - "8080:8080"
+      - "8080:9001"
       - "9000:9000"
     deploy:
       resources:
@@ -79,11 +79,12 @@ services:
       # https://docs.letta.com/guides/server/providers/anthropic
       ANTHROPIC_API_KEY: $ANTHROPIC_API_KEY
       # https://docs.letta.com/guides/server/providers/google
-      GEMINI_API_KEY: $GEMINI_API_KEY    
+      GEMINI_API_KEY: $GEMINI_API_KEY 
       # Setting this up means we can do postgresql://letta:letta@localhost:5432/letta in Letta Desktop
       LETTA_PG_DB: ${LETTA_PG_DB:-letta}
       LETTA_PG_USER: ${LETTA_PG_USER:-letta}
       LETTA_PG_PASSWORD: ${LETTA_PG_PASSWORD:-letta}
+      TAVILY_API_KEY: ${TAVILY_API_KEY}
     restart: on-failure
     healthcheck:
       test: ["CMD", "curl", "-f", "http://127.0.0.1:8283/v1/health/"]
@@ -91,6 +92,57 @@ services:
       timeout: 5s
       retries: 18
       start_period: 1s
+
+
+  # Open WebUI is the front-end UI to Letta
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:0.6.18
+    container_name: recipellm-open-webui
+    volumes:
+     - open-webui:/app/backend/data
+    ports:
+      - 3000:8080
+    environment:
+      # https://docs.openwebui.com/getting-started/env-configuration/
+      - GLOBAL_LOG_LEVEL=INFO
+      # Disable admin login
+      - WEBUI_AUTH=false
+      # Enable the /docs endpoint for OpenAPI viewing
+      #- ENV=dev
+      # Prevent a langchain warning
+      - USER_AGENT=openwebui
+      # Set tags and titles explictly
+      - ENABLE_TAGS_GENERATION=false
+      - ENABLE_TITLE_GENERATION=false
+      #- TASK_MODEL=$TASK_MODEL
+      #- TASK_MODEL_EXTERNAL=$TASK_MODEL_EXTERNAL
+      # Disable some meaningless options
+      - ENABLE_EVALUATION_ARENA_MODELS=false
+      - ENABLE_AUTOCOMPLETE_GENERATION=false
+      - ENABLE_RETRIEVAL_QUERY_GENERATION=false
+      - ENABLE_FOLLOW_UP_GENERATION=false
+      # OpenAI selection should go to Hayhooks to show agents
+      - ENABLE_OPENAI_API=true
+      - OPENAI_API_BASE_URL=http://recipellm-letta-openai-proxy:1416
+      - OPENAI_API_KEY=no_key_required
+      # Ollama Options
+      - ENABLE_OLLAMA_API=false
+      # RAG options can be transformers, ollama, or openai 
+      - RAG_EMBEDDING_ENGINE=openai
+      # Tavily Web Search in Open WebUI
+      - ENABLE_WEB_SEARCH=false
+      - WEB_SEARCH_ENGINE=tavily
+      - TAVILY_API_KEY=$TAVILY_API_KEY
+      # Audio options
+      #- AUDIO_STT_ENGINE=$AUDIO_STT_ENGINE
+    restart: unless-stopped
+    # https://docs.openwebui.com/getting-started/advanced-topics/monitoring/#basic-health-check-endpoint
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://127.0.0.1:3000/health"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 18
+    #   start_period: 5s
 
   ntfy:
       image: binwiederhier/ntfy:latest
@@ -142,3 +194,4 @@ volumes:
   mcp-data:
   ntfy-data:
   ntfy-cache:
+  open-webui:

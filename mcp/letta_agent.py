@@ -170,7 +170,7 @@ class LettaAgent:
         letta_model = self._default_letta_model()
         letta_embedding = self._default_letta_embedding()
         requested_tools = [
-            "notify",
+            "notify",            
             "schedule_notification",
             "find_recipes_in_mealie",
             "add_recipe_to_mealie_from_url",
