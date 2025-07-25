@@ -304,6 +304,50 @@ async def setup(mealie_base_url, mealie_api_key, recipellm_mcp_server_url):
                 str: Success message.
             """
             return mealie_client.add_recipe_note(recipe_slug, note_title, note_text)
+
+        @mcp.tool
+        async def create_recipe_from_arguments(
+            name: str,
+            directions: str,
+            ingredients: str,
+            author: str = "",
+            cook_time: str = "10m",
+            prep_time: str = "10m", 
+            total_time: str = "20m",
+            servings: str = "",
+            source_url: str = "",
+            description: str = ""
+        ) -> str:
+            """Creates a recipe in Mealie from raw text. Use this when you have Markdown or text recipes that you have to import into Mealie.
+
+            Args:
+                name (str): The name of the recipe.
+                directions (str): The directions for the recipe, one direction per paragraph.
+                ingredients (str): The ingredients for the recipe, one ingredient per line,
+                    with no "-" or "*" markdown list items.
+                author (str): The author of the recipe.
+                cook_time (str): The cooking time for the recipe.
+                prep_time (str): The prep time for the recipe.
+                total_time (str): The total time for the recipe.
+                servings (str): The number of servings in the recipe.
+                source_url (str): The source URL for the recipe.
+                description (str): The description for the recipe.
+
+            Returns:
+                str: The slug of the new recipe.
+            """
+            return mealie_client.create_recipe_from_arguments(
+                name=name,
+                directions=directions,
+                ingredients=ingredients,
+                author=author,
+                cook_time=cook_time,
+                prep_time=prep_time,
+                total_time=total_time,
+                servings=servings,
+                source_url=source_url,
+                description=description
+            )
     except Exception as e:
         logger.error("Failed to setup server", error=str(e), exc_info=True)
         raise

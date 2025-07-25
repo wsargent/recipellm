@@ -48,10 +48,24 @@ There's also the OpenAI proxy interface if you want to connect directly to the a
 
 * OpenAI API: [http://localhost:1416/v1/models](http://localhost:1416/v1/models)
 
+## Interacting
+
+The first thing to do is go to http://localhost:3000 and start filling the agent in on your skill level and what you want.  It will remember your details and can adjust recipes and instructions to match your personal tastes.
+
+![introduction](./introduction.png)
+
+It can import recipes in to Mealie, but it's also good at describing the recipe in context:
+
+![cooking](./cooking.png)
+
+You can ask it to set reminders and notifications for you -- these will be sent to the local ntfy instance at http://localhot and you will hear a ping when the timer goes off.  You can also configure ntfy to send notifcations to your iPhone or Android device, which is what I do personally.
+
 ## Resetting
 
 To delete the existing data and start from scratch, you can down and delete the volume and orphans:
 
 ```
-docker compose down -v --remove-orphans 
+rm -rf ~/.letta # if you want to delete the letta database
+
+docker compose down -v --remove-orphans # if you want to delete mealie / ntfy
 ```
