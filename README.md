@@ -58,7 +58,9 @@ It can import recipes in to Mealie, but it's also good at describing the recipe 
 
 ![cooking](./cooking.png)
 
-You can ask it to set reminders and notifications for you -- these will be sent to the local ntfy instance at http://localhot and you will hear a ping when the timer goes off.  You can also configure ntfy to send notifcations to your iPhone or Android device, which is what I do personally.
+## Notifications
+
+You can ask it to set reminders and notifications for you -- these will be sent to the local ntfy instance at http://localhost and you will hear a ping when the timer goes off.  You can also configure ntfy to send notifcations to your iPhone or Android device, which is what I do personally.
 
 ## Resetting
 
