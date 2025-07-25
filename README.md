@@ -7,7 +7,7 @@ This is an "out of the box" system that sets up an AI agent with a recipe manage
 
 I started working on this a few months ago to learn how to cook.  It's like working with an experienced chef that can answer questions and fill in the gaps on cooking.
 
-The first time you start it, you go to http://localhost:3000 and start filling the agent in on your skill level and what you want.  It will remember your details and can adjust recipes and instructions to match your personal tastes.
+The first time you start it, you go to http://localhost:3000 to use [Open WebUI](https://docs.openwebui.com/) and start filling the agent in on your skill level and what you want.  It will remember your details and can adjust recipes and instructions to match your personal tastes.
 
 ![introduction](./introduction.png)
 
@@ -15,7 +15,9 @@ It can search the web and [import recipes into Mealie](https://tersesystems.com/
 
 ![cooking](./cooking.png)
 
-When you start cooking, you can tell it what you're doing and it will walk you through any adjustments you need to make and let you know how to fix any mistakes.  Here's an [example blog post](https://tersesystems.com/blog/2025/02/14/cooking-with-llms/).
+When you start cooking, you can tell it what you're doing and it will walk you through any adjustments you need to make and let you know how to fix any mistakes.  For example, you can unpack the prep work into actual instructions:
+
+![prep work](./prep_work.png)
 
 I like to use this while I'm on the iPad, using Apple Dictation.  The below picture shows me using the self-hosted dev environment while making [ginger chicken](https://tersesystems.com/blog/2025/03/07/llm-complexity-and-pricing/).
 
