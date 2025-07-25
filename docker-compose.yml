@@ -73,8 +73,11 @@ services:
     container_name: recipellm-letta
     ports:
       - 8283:8283
+      # - 5432:5432
     volumes:
-      - ~/.letta/.persist/pgdata:/var/lib/postgresql/data      
+      # This lets you see pgdata in the home directory and use it from Letta Desktop
+      # It _does_ mean that letta's memory persists even if you use docker compose down -v though
+      - ~/.letta/.persist/pgdata:/var/lib/postgresql/data
     environment:
       LETTA_DEBUG: "${LETTA_DEBUG:-false}"
       # https://docs.letta.com/guides/server/providers/anthropic

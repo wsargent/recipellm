@@ -28,6 +28,8 @@ If you want to use OpenAI, you'll want an [OpenAI API Key](https://platform.open
 LETTA_CHAT_MODEL=openai/gpt-4.1
 ```
 
+You can also download recipes from the web if you have [Tavily](https://www.tavily.com/) set up.  An API key is free and you can do 1000 searches a month.
+
 ## Running
 
 Set up the system by running docker compose
@@ -38,7 +40,7 @@ docker compose up --build
 
 The Docker Compose images may take a while to download and run, so give them a minute.  Once they're up, you'll have three web applications running:
 
-* Open WebUI (how you chat with the agent): [http://localhost:8080](http://localhost:8080)
+* Open WebUI (how you chat with the agent): [http://localhost:3000](http://localhost:3000)
 * ntfy (which handles real time notifications): [http://localhost:80](http://localhost:80)
 * Mealie (the recipe manager): [http://localhost:9000](http://localhost:9000)
 
