@@ -27,7 +27,7 @@ I like to use this while I'm on the iPad, using Apple Dictation.  The below pict
 
 You will need [Docker Compose](https://docs.docker.com/compose/install/) installed.
 
-RecipeLLM requires an API key to a reasonably powerful LLM: either OpenAI, Anthropic, or Gemini.
+RecipeLLM requires an API key to a reasonably powerful LLM: either OpenAI, Anthropic, or Gemini.  You'll need to set `env.example` to `.env` and set the API and `LETTA_CHAT_MODEL` appropriately.
 
 If you want to use Google AI Gemini models, you will need a [Gemini API key](https://ai.google.dev/gemini-api/docs/api-key).
 
