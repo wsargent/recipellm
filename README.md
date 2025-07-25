@@ -21,8 +21,6 @@ I like to use this while I'm on the iPad, using Apple Dictation.  The below pict
 
 ![ipad](https://tersesystems.com/images/2025-03-07/letta.jpg)
 
-So 
-
 ## Requirements
 
 You will need [Docker Compose](https://docs.docker.com/compose/install/) installed.
