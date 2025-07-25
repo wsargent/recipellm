@@ -69,12 +69,24 @@ There's also the OpenAI proxy interface if you want to connect directly to the a
 
 You can ask it to set reminders and notifications for you -- these will be sent to the local ntfy instance at http://localhost and you will hear a ping when the timer goes off.  You can also configure ntfy to send notifcations to your iPhone or Android device, which is what I do personally.
 
+## Modifications
+
+If you want to debug or add to the chef agent, you can use [Letta Desktop](https://docs.letta.com/guides/desktop/install) and connect to the database using `letta` as the username, password, and database:
+
+```
+postgresql://letta:letta@localhost:5432/letta
+```
+
+When you connect via Letta Desktop it'll look like this:
+
+![Letta Desktop](./letta_desktop.png)
+
+You can change your model, add more instructions to core memory, and add or remove tools.
+
 ## Resetting
 
 To delete the existing data and start from scratch, you can down and delete the volume and orphans:
 
 ```
-rm -rf ~/.letta # if you want to delete the letta database
-
-docker compose down -v --remove-orphans # if you want to delete mealie / ntfy
+docker compose down -v --remove-orphans
 ```
